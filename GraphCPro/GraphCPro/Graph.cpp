@@ -57,8 +57,8 @@ void DFSTraverse(int nVex, PathList &pList)
 
 void DFS(int nVex, bool bVisited[], int &nIndex, PathList &pList)
 {//改进的图的深度优先遍历算法
-	bVisited[nVex] = true;				//改为已访问
-	pList->vexs[nIndex] = nVex;		//访问顶点nVex并赋值给链表，然后索引值自加
+	bVisited[nVex] = true;				
+	pList->vexs[nIndex] = nVex;		
 	nIndex++;
 
 	//根据状态判断得到的路径是否完整									
