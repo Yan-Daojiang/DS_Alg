@@ -1,6 +1,7 @@
 #include<iostream>
 #include"Tourism.h"
 using namespace std;
+
 void doChoose();
 void output();
 
@@ -8,6 +9,7 @@ int main()
 {
 	
 	cout << "================欢迎来到景区管理系统=============" << endl;
+	cout << "!!!!!!!!!!!!!请确保您的所有操作在建立图后进行!!!!!!!!!!!!!!!!" << endl;
 	doChoose();
 	system("pause");
 	return 0;
@@ -17,25 +19,25 @@ void doChoose()
 {
 	int nSection = -1;
 	do {
-		output();
+		output();//展示菜单
 		nSection = -1;
 		cin >> nSection;
-		switch (nSection)
-		{
-		case 1:
-		{
+		switch (nSection){
+		case 1:{
 			CreateGraph();
 			break;
 		}
-		case 2:
-		{
+		case 2:{
 			GetSpotInfo();
+			break;
+		}
+		case 3:{
+			TravelPath();
 			break;
 		}
 		default:
 			break;
 		}
-
 	} while (nSection != 0);
 }
 

@@ -3,6 +3,7 @@
 #include"Graph.h"
 #include<cstdlib>
 #include<iostream>
-void CreateGraph(void);
-void GetSpotInfo(void);
+void CreateGraph();
+void GetSpotInfo();
+void TravelPath();
 #endif // !Tourism_H
