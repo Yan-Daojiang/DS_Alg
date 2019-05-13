@@ -35,6 +35,10 @@ void doChoose()
 			TravelPath();
 			break;
 		}
+		case 5: {
+			DesignPath();
+			break;
+		}
 		default:
 			break;
 		}

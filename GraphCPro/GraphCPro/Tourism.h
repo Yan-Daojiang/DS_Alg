@@ -6,4 +6,6 @@
 void CreateGraph();
 void GetSpotInfo();
 void TravelPath();
+
+void DesignPath();
 #endif // !Tourism_H

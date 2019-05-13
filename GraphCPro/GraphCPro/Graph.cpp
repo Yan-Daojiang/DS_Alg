@@ -88,3 +88,37 @@ void DFS(int nVex, bool bVisited[], int &nIndex, PathList &pList)
 		}
 	}
 }
+
+int FindMinTree(Edge aPath[])
+{//使用普林姆算法求最小生成树
+	bool aVisited[20] = { false };		//判断是否将某个顶点加入到了生成树中
+	aVisited[0] = true;					//顶点0开始
+	int length = 0;
+	int min;
+	int nVex1, nVex2;
+	int minTreeNum = m_Graph.m_nVexNum - 1;	//计算得到最小生成树的变数
+	for (int k = 0; k < minTreeNum; k++) {
+		min = INT16_MAX;
+		for (int i = 0; i < m_Graph.m_nVexNum; i++) {
+			if (aVisited[i]) {
+				for (int j = 0; j < m_Graph.m_nVexNum; j++) {
+					//点没有访问,有边同时这两点的距离要比之前循环得到的小就更新
+					if (!aVisited[j] && m_Graph.m_aAdjMatrix[i][j] != 0 && m_Graph.m_aAdjMatrix[i][j] < min) {
+						nVex1 = i;
+						nVex2 = j;
+						min = m_Graph.m_aAdjMatrix[nVex1][nVex2];
+					}
+				}
+			}
+		}
+		length += min;	//更新长度
+		//保存边的两个顶点
+		aPath[k].vex1 = nVex1;
+		aPath[k].vex2 = nVex2;
+		aPath[k].weight = m_Graph.m_aAdjMatrix[nVex1][nVex2];
+		//将两个顶点加入集合
+		aVisited[nVex1] = true;
+		aVisited[nVex2] = true;
+	}
+	return length;
+}

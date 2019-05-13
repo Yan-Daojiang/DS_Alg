@@ -111,3 +111,20 @@ void TravelPath()
 		pList = pList->next;
 	}
 }
+
+
+void DesignPath(void)
+{
+	cout << "==========铺设电路规划==========" << endl;
+	Edge aPath[20];
+	int length = FindMinTree(aPath);
+	int nVexNum = m_Graph.m_nVexNum;
+	cout << "在以下两个景点之间铺设电路：" << endl;
+	for (int i = 0; i < m_Graph.m_nVexNum - 1; i++)
+	{
+		Vex nVex1 = GetVex(aPath[i].vex1);
+		Vex nVex2 = GetVex(aPath[i].vex2);
+		cout << nVex1.name << "-" << nVex2.name << "    " << aPath[i].weight << "m" << endl;
+	}
+	cout << "铺设电路的总长度是：" << length << "m" << endl;
+}
