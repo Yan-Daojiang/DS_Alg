@@ -25,7 +25,7 @@ int main()
 	
 	/*
 	cout << "============原文件每个字符的权值=========" << endl;
-	cout<<"\tByte"<<"\t\t"<<"Weigth"<<endl;
+	
 	for (int i = 0; i < 256; i++)
 	{
 		printf("\t0x%02x\t\t%d\n", i, weight[i]);
