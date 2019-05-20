@@ -112,12 +112,47 @@ void TravelPath()
 	}
 }
 
+void FindShortPath(void)
+{
+	cout << "==========搜索最短路径==========" << endl;
+	int nVexNum = m_Graph.m_nVexNum;
+	//对应关系显示	
+	for (int i = 0; i < m_Graph.m_nVexNum; i++)
+	{
+		Vex sVex = GetVex(i);
+		cout << i << "-" << sVex.name << endl;
+	}
+
+	int start_place, end_place;
+	cout << "请输入起点的编号：";
+	cin >> start_place;
+	cout << "请输入终点的编号：";
+	cin >> end_place;
+
+	Edge aPath[20];						//边信息数组，依次保存最短的路径
+	
+	//查找最短路径，并给最短路径的条数index赋值
+	int index = FindShortPath(start_place, end_place, aPath);
+	int length = 0;						//最短路径总长度
+	Vex sVex = GetVex(aPath[0].vex1);	//顶点信息（景点信息）
+
+	//将最短路径输出，显示
+	cout << "最短路径为：" << sVex.name;
+	for (int i = 0; i < index; i++) {
+		sVex = GetVex(aPath[i].vex2);
+		cout << "->" << sVex.name;
+		length += aPath[i].weight;
+	}
+	cout << endl;
+	cout << "最短距离为：" << length << endl << endl;;
+
+}
 
 void DesignPath(void)
 {
 	cout << "==========铺设电路规划==========" << endl;
 	Edge aPath[20];
-	int length = FindMinTree(aPath);
+	int length=FindMinTree(aPath);
 	int nVexNum = m_Graph.m_nVexNum;
 	cout << "在以下两个景点之间铺设电路：" << endl;
 	for (int i = 0; i < m_Graph.m_nVexNum - 1; i++)
@@ -126,5 +161,5 @@ void DesignPath(void)
 		Vex nVex2 = GetVex(aPath[i].vex2);
 		cout << nVex1.name << "-" << nVex2.name << "    " << aPath[i].weight << "m" << endl;
 	}
-	cout << "铺设电路的总长度是：" << length << "m" << endl;
+	cout << "铺设电路的总长度是：" <<length << "m" << endl;
 }

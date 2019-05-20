@@ -35,6 +35,10 @@ void doChoose()
 			TravelPath();
 			break;
 		}
+		case 4: {
+			FindShortPath();
+			break;
+		}
 		case 5: {
 			DesignPath();
 			break;

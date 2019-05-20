@@ -35,7 +35,7 @@ int FindEdge(int nVex, Edge aEdge[]);
 int GetVexnum(void);
 void DFS(int nVex, bool bVisit[], int &nIndex, PathList &pList);
 void DFSTraverse(int nVex, PathList &pList);
-
+int FindShortPath(int nVexStart, int nVexEnd, Edge aPath[]);
 int FindMinTree(Edge aPath[]);
 #endif
 
