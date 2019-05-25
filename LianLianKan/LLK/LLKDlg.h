@@ -33,6 +33,4 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 	void InitBackground();
-public:
-	afx_msg void OnClickedButtonBaisc();
 };
