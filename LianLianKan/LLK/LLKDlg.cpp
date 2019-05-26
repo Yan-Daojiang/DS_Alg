@@ -6,6 +6,7 @@
 #include "LLK.h"
 #include "LLKDlg.h"
 #include "afxdialogex.h"
+#include "CGameDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -64,6 +65,7 @@ BEGIN_MESSAGE_MAP(CLLKDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_BUTTON_BAISC, &CLLKDlg::OnClickedButtonBaisc)
 END_MESSAGE_MAP()
 
 
@@ -168,5 +170,16 @@ void CLLKDlg::InitBackground()
 
 	//将位图选进DC
 	m_dcMem.SelectObject(&bmpMain);
+
+}
+
+void CLLKDlg::OnClickedButtonBaisc()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	this->ShowWindow(SW_HIDE);	 //主界面隐藏
+	CGameDlg dlg;
+	dlg.DoModal();	//创建显示模态对话框
+	this->ShowWindow(SW_SHOW);	
+
 
 }
