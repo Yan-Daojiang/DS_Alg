@@ -22,8 +22,11 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	void InitBackground();
-
-	CDC m_dcMem;
+	void UpdateWindow();
+	CDC m_dcBG;		 //背景dc
+	CDC m_dcMem;	//内存dc
 	virtual BOOL OnInitDialog();
 	afx_msg void OnPaint();
+	afx_msg void OnBnClickedButton6();
+	afx_msg void OnBnClickedButton1();
 };

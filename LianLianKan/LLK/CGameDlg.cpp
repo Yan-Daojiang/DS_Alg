@@ -35,19 +35,35 @@ END_MESSAGE_MAP()
 // CGameDlg 消息处理程序
 
 
+//初始化游戏界面的窗口的背景和大小
+
+//TODO:游戏界面对话框的图表暂时还未实现
+
 void CGameDlg::InitBackground()
 {
-	// TODO: 在此处添加实现代码.
-
 	//加载BMP图片资源
-	HANDLE bmp = ::LoadImage(NULL, _T("theme\\picture\\fruit_bg.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+	HANDLE Backbmp = ::LoadImage(NULL, _T("theme\\picture\\fruit_bg.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 
-	//获取当前的内存dc
+	//获得当前对话框的视频内容
 	CClientDC dc(this);
 
-	m_dcMem.CreateCompatibleDC(&dc);
+	//创建与视频内容兼容的内存DC
+	m_dcBG.CreateCompatibleDC(&dc);
+
 	//将位图资源选入DC
-	m_dcMem.SelectObject(bmp);
+	m_dcBG.SelectObject(Backbmp);
+
+	//初始化内存DC
+	m_dcMem.CreateCompatibleDC(&dc);
+	CBitmap bmpMem;
+	bmpMem.CreateCompatibleBitmap(&dc, 800, 600);
+	m_dcMem.SelectObject(&bmpMem);
+
+	//绘制背景到内存DC中
+	m_dcMem.BitBlt(0, 0, 800, 600, &m_dcBG, 0, 0, SRCCOPY);
+
+	//调用函数设置窗口大小
+	UpdateWindow();
 
 }
 
@@ -58,6 +74,9 @@ BOOL CGameDlg::OnInitDialog()
 
 	// TODO:  在此添加额外的初始化
 
+	//设置窗口标题
+	this->SetWindowTextW(_T("欢乐连连看  基本模式"));
+	
 	//初始化
 	InitBackground();
 
@@ -73,4 +92,27 @@ void CGameDlg::OnPaint()
 					   // 不为绘图消息调用 CDialogEx::OnPaint()
 	//绘制背景图片
 	dc.BitBlt(0, 0, 800, 600, &m_dcMem, 0, 0, SRCCOPY);
+}
+
+
+//调整窗口大小为800*600
+void CGameDlg::UpdateWindow()
+{
+
+	// TODO: 在此处添加实现代码.
+
+	//调整窗口大小
+	CRect rtWin;
+	CRect rtClient;
+	this->GetWindowRect(rtWin);		//获得窗口大小
+	this->GetWindowRect(rtClient);	//获得客户区大小
+
+									//标题栏和外边框的大小
+	int nSpanWidth = rtWin.Width() - rtClient.Width();
+	int nSpanHeight = rtWin.Width() - rtClient.Width();
+
+	//设置窗口大小
+	MoveWindow(0, 0, 800 + nSpanWidth, 600 + nSpanHeight);
+
+	CenterWindow();
 }
