@@ -10,7 +10,7 @@ class CGameDlg : public CDialogEx
 public:
 	CGameDlg(CWnd* pParent = nullptr);   // 标准构造函数
 	virtual ~CGameDlg();
-
+	HICON m_hIcon;
 // 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_GAME_DIALOG };    //通过ID进行对话框的关联

@@ -14,7 +14,7 @@ IMPLEMENT_DYNAMIC(CGameDlg, CDialogEx)
 CGameDlg::CGameDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_GAME_DIALOG, pParent)
 {
-
+	m_hIcon= AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
 CGameDlg::~CGameDlg()
@@ -92,6 +92,10 @@ void CGameDlg::OnPaint()
 					   // 不为绘图消息调用 CDialogEx::OnPaint()
 	//绘制背景图片
 	dc.BitBlt(0, 0, 800, 600, &m_dcMem, 0, 0, SRCCOPY);
+
+	//设置此对话框的图标
+	SetIcon(m_hIcon, TRUE);			// 设置大图标
+	SetIcon(m_hIcon, FALSE);		// 设置小图标
 }
 
 
