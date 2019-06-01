@@ -1,5 +1,4 @@
-﻿
-// LLKDlg.h: 头文件
+﻿// LLKDlg.h: 头文件
 //
 
 #pragma once
@@ -8,7 +7,7 @@
 // CLLKDlg 对话框
 class CLLKDlg : public CDialogEx
 {
-// 构造
+	// 构造
 public:
 	CLLKDlg(CWnd* pParent = nullptr);	// 标准构造函数
 
@@ -17,7 +16,7 @@ public:
 	enum { IDD = IDD_LLK_DIALOG };
 #endif
 
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
 
 
@@ -34,5 +33,6 @@ protected:
 
 	void InitBackground();
 public:
-	afx_msg void OnClickedButtonBaisc();
+	afx_msg void OnClickedButtonBasic();
+
 };

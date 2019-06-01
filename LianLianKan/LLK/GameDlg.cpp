@@ -1,20 +1,35 @@
-ï»¿// CGameDlg.cpp: å®ç°æ–‡ä»¶
+// CGameDlg.cpp: ÊµÏÖÎÄ¼ş
 //
 
 #include "stdafx.h"
 #include "LLK.h"
-#include "CGameDlg.h"
+#include "GameDlg.h"
 #include "afxdialogex.h"
 
 
-// CGameDlg å¯¹è¯æ¡†
+// CGameDlg ¶Ô»°¿ò
 
 IMPLEMENT_DYNAMIC(CGameDlg, CDialogEx)
 
 CGameDlg::CGameDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_GAME_DIALOG, pParent)
 {
-	m_hIcon= AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	//³õÊ¼»¯ÆğÊ¼µã×ø±ê
+	m_ptGameTop.x = 50;
+	m_ptGameTop.y = 50;
+
+	//³õÊ¼»¯Í¼Æ¬ÔªËØ´óĞ¡
+	m_sizeElem.cx = 40;
+	m_sizeElem.cy = 40;
+
+	//³õÊ¼»¯ÓÎÏ·¸üĞÂÇøÓò
+	m_rtGameRect.top = m_ptGameTop.y;
+	m_rtGameRect.left = m_ptGameTop.x;
+	m_rtGameRect.right = m_rtGameRect.left + m_sizeElem.cx * MAX_COL;
+	m_rtGameRect.bottom = m_rtGameRect.top + m_sizeElem.cy * MAX_ROW;
+
+	
+
 }
 
 CGameDlg::~CGameDlg()
@@ -24,6 +39,7 @@ CGameDlg::~CGameDlg()
 void CGameDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_GAME_TIME, m_GameProgress);
 }
 
 
@@ -33,153 +49,137 @@ BEGIN_MESSAGE_MAP(CGameDlg, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CGameDlg æ¶ˆæ¯å¤„ç†ç¨‹åº
-
-
-//åˆå§‹åŒ–æ¸¸æˆç•Œé¢çš„çª—å£çš„èƒŒæ™¯å’Œå¤§å°
-
-//TODO:æ¸¸æˆç•Œé¢å¯¹è¯æ¡†çš„å›¾è¡¨æš‚æ—¶è¿˜æœªå®ç°
-
-//åˆå§‹åŒ–çª—å£èƒŒæ™¯å’Œå¤§å°
+//³õÊ¼»¯´°¿Ú±³¾°ºÍ´óĞ¡
 void CGameDlg::InitBackground()
-{	// TODO: åœ¨æ­¤å¤„æ·»åŠ å®ç°ä»£ç .
+{	// TODO: ÔÚ´Ë´¦Ìí¼ÓÊµÏÖ´úÂë.
 
-	//åŠ è½½BMPå›¾ç‰‡èµ„æº
+	//¼ÓÔØBMPÍ¼Æ¬×ÊÔ´
 	HANDLE Backbmp = ::LoadImage(NULL, _T("theme\\picture\\fruit_bg.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 
-	//è·å¾—å½“å‰å¯¹è¯æ¡†çš„è§†é¢‘å†…å®¹
+	//»ñµÃµ±Ç°¶Ô»°¿òµÄÊÓÆµÄÚÈİ
 	CClientDC dc(this);
 
-	//åˆ›å»ºä¸è§†é¢‘å†…å®¹å…¼å®¹çš„å†…å­˜DC
+	//´´½¨ÓëÊÓÆµÄÚÈİ¼æÈİµÄÄÚ´æDC
 	m_dcBG.CreateCompatibleDC(&dc);
 
-	//å°†ä½å›¾èµ„æºé€‰å…¥DC
+	//½«Î»Í¼×ÊÔ´Ñ¡ÈëDC
 	m_dcBG.SelectObject(Backbmp);
 
-	//åˆå§‹åŒ–å†…å­˜DC
+	//³õÊ¼»¯ÄÚ´æDC
 	m_dcMem.CreateCompatibleDC(&dc);
 	CBitmap bmpMem;
 	bmpMem.CreateCompatibleBitmap(&dc, 800, 600);
 	m_dcMem.SelectObject(&bmpMem);
 
-	//ç»˜åˆ¶èƒŒæ™¯åˆ°å†…å­˜DCä¸­
+	//hu»æÖÆ±³¾°µ½ÄÚ´æDCÖĞ
 	m_dcMem.BitBlt(0, 0, 800, 600, &m_dcBG, 0, 0, SRCCOPY);
 
-	//è®¾ç½®çª—å£å¤§å°
+	//ÉèÖÃ´°¿Ú´óĞ¡
 	UpdateWindow();
 }
-
 
 
 BOOL CGameDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  åœ¨æ­¤æ·»åŠ é¢å¤–çš„åˆå§‹åŒ–
+	// TODO:  ÔÚ´ËÌí¼Ó¶îÍâµÄ³õÊ¼»¯
+	//´°¿Ú±êÌâ
+	this->SetWindowTextW(_T("»¶ÀÖÁ¬Á¬¿´¡¡»ù±¾Ä£Ê½"));
 
-	//è®¾ç½®çª—å£æ ‡é¢˜
-	this->SetWindowTextW(_T("æ¬¢ä¹è¿è¿çœ‹  åŸºæœ¬æ¨¡å¼"));
-	
-	//åˆå§‹åŒ–
+	//³õÊ¼»¯±³¾°
 	InitBackground();
 
-	//åˆå§‹åŒ–å…ƒç´ 
+	//³õÊ¼»¯ÔªËØ
 	InitElement();
 
+	//ÉèÖÃ½ø¶ÈÌõÒş²ØºÍÊ£ÓàÊ±¼ä¿Ø¼ş
+	this->GetDlgItem(IDC_GAME_TIME)->ShowWindow(FALSE);
+	this->GetDlgItem(IDC_EDIT_TIME)->ShowWindow(FALSE);
+
+
 	return TRUE;  // return TRUE unless you set the focus to a control
-				  // å¼‚å¸¸: OCX å±æ€§é¡µåº”è¿”å› FALSE
+				  // Òì³£: OCX ÊôĞÔÒ³Ó¦·µ»Ø FALSE
 }
 
 
 void CGameDlg::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
-					   // TODO: åœ¨æ­¤å¤„æ·»åŠ æ¶ˆæ¯å¤„ç†ç¨‹åºä»£ç 
-					   // ä¸ä¸ºç»˜å›¾æ¶ˆæ¯è°ƒç”¨ CDialogEx::OnPaint()
-	//ç»˜åˆ¶èƒŒæ™¯å›¾ç‰‡
+					   // TODO: ÔÚ´Ë´¦Ìí¼ÓÏûÏ¢´¦Àí³ÌĞò´úÂë
+					   // ²»Îª»æÍ¼ÏûÏ¢µ÷ÓÃ CDialogEx::OnPaint()
 	dc.BitBlt(0, 0, 800, 600, &m_dcMem, 0, 0, SRCCOPY);
-
-	//è®¾ç½®æ­¤å¯¹è¯æ¡†çš„å›¾æ ‡
-	SetIcon(m_hIcon, TRUE);			// è®¾ç½®å¤§å›¾æ ‡
-	SetIcon(m_hIcon, FALSE);		// è®¾ç½®å°å›¾æ ‡
 }
 
-
-//è°ƒæ•´çª—å£å¤§å°ä¸º800*600
-void CGameDlg::UpdateWindow()
-{
-
-	// TODO: åœ¨æ­¤å¤„æ·»åŠ å®ç°ä»£ç .
-
-	//è°ƒæ•´çª—å£å¤§å°
-	CRect rtWin;
-	CRect rtClient;
-	this->GetWindowRect(rtWin);		//è·å¾—çª—å£å¤§å°
-	this->GetWindowRect(rtClient);	//è·å¾—å®¢æˆ·åŒºå¤§å°
-
-									//æ ‡é¢˜æ å’Œå¤–è¾¹æ¡†çš„å¤§å°
-	int nSpanWidth = rtWin.Width() - rtClient.Width();
-	int nSpanHeight = rtWin.Width() - rtClient.Width();
-
-	//è®¾ç½®çª—å£å¤§å°
-	MoveWindow(0, 0, 800 + nSpanWidth, 600 + nSpanHeight);
-
-	CenterWindow();
-}
-
-
-//åˆå§‹åŒ–å…ƒç´ 
+//³õÊ¼»¯ÔªËØ
 void CGameDlg::InitElement() {
 	CClientDC dc(this);
 
-	//åŠ è½½BMPå›¾ç‰‡èµ„æº
+	//¼ÓÔØBMPÍ¼Æ¬×ÊÔ´
 	HANDLE Elmbmp = ::LoadImage(NULL, _T("theme\\picture\\fruit_element.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 
 	m_dcElm.CreateCompatibleDC(&dc);
 
 	m_dcElm.SelectObject(Elmbmp);
 
-	//æ©ç å›¾åŠ è½½
+	//ÑÚÂëÍ¼¼ÓÔØ
 	HANDLE Maskbmp = ::LoadImage(NULL, _T("theme\\picture\\fruit_mask.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 
 	m_dcMask.CreateCompatibleDC(&dc);
 
 	m_dcMask.SelectObject(Maskbmp);
 
-	//åŠ è½½æ©ç›–å›¾ç‰‡
-	//åŠ è½½BMPå›¾ç‰‡èµ„æº
+	//¼ÓÔØÑÚ¸ÇÍ¼Æ¬
+	//¼ÓÔØBMPÍ¼Æ¬×ÊÔ´
 	HANDLE hCache = ::LoadImage(NULL, _T("theme\\picture\\fruit_pause.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-	//åˆ›å»ºä¸è§†é¢‘å†…å­˜å…¼å®¹çš„å†…å­˜DC
+	//´´½¨ÓëÊÓÆµÄÚ´æ¼æÈİµÄÄÚ´æDC
 	m_dcCache.CreateCompatibleDC(&dc);
-	//å°†ä½å›¾èµ„æºé€‰å…¥DC
+	//½«Î»Í¼×ÊÔ´Ñ¡ÈëDC
 	m_dcCache.SelectObject(hCache);
 
 }
 
-//å¼€å§‹æ¸¸æˆ
+//¿ªÊ¼ÓÎÏ·
 void CGameDlg::OnClickedButtonStart()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
-
-	
-
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 	m_gameControl.StartGame();
 
-	//æ›´æ–°åœ°å›¾
+	//¸üĞÂµØÍ¼
 	UpdateMap();
 
-	//æ›´æ–°çª—å£
-	Invalidate(FALSE);
-
-	
+	//¸üĞÂ´°¿Ú
+	Invalidate(FALSE);	
 }
 
-//æ›´æ–°åœ°å›¾
+//µ÷Õû´°¿Ú´óĞ¡
+void CGameDlg::UpdateWindow()
+{
+
+	// TODO: ÔÚ´Ë´¦Ìí¼ÓÊµÏÖ´úÂë.
+
+	//µ÷Õû´°¿Ú´óĞ¡
+	CRect rtWin;
+	CRect rtClient;
+	this->GetWindowRect(rtWin);		//»ñµÃ´°¿Ú´óĞ¡
+	this->GetWindowRect(rtClient);	//»ñµÃ¿Í»§Çø´óĞ¡
+
+									//±êÌâÀ¸ºÍÍâ±ß¿òµÄ´óĞ¡
+	int nSpanWidth = rtWin.Width() - rtClient.Width();
+	int nSpanHeight = rtWin.Width() - rtClient.Width();
+
+	//ÉèÖÃ´°¿Ú´óĞ¡
+	MoveWindow(0, 0, 800 + nSpanWidth, 600 + nSpanHeight);
+
+	CenterWindow();
+}
+
+//¸üĞÂµØÍ¼
 void CGameDlg::UpdateMap()
 {
-	// TODO: åœ¨æ­¤å¤„æ·»åŠ å®ç°ä»£ç .
+	// TODO: ÔÚ´Ë´¦Ìí¼ÓÊµÏÖ´úÂë.
 
-	//è®¡ç®—å›¾ç‰‡çš„é¡¶ç‚¹åæ ‡ä¸å›¾ç‰‡å¤§å°
+	//¼ÆËãÍ¼Æ¬µÄ¶¥µã×ø±êÓëÍ¼Æ¬´óĞ¡
 	int nTop = m_ptGameTop.y;
 	int nLeft = m_ptGameTop.x;
 	int nElemW = m_sizeElem.cx;
@@ -191,14 +191,14 @@ void CGameDlg::UpdateMap()
 	for (int i = 0; i < MAX_ROW; i++) {
 		for (int j = 0; j < MAX_COL; j++) {
 
-			int nInfo = m_gameControl.GetElement(i, j);       //å½“å‰å…ƒç´ å›¾ç‰‡çš„æ•°å€¼
+			int nInfo = m_gameControl.GetElement(i, j);       //µ±Ç°ÔªËØÍ¼Æ¬µÄÊıÖµ
 			if (nInfo == BLANK)  continue;
 
 
-			//å°†èƒŒæ™¯ä¸æ©ç ç›¸æˆ–ï¼Œè¾¹ä¿ç•™ï¼Œå›¾åƒåŒºåŸŸä¸º1
+			//½«±³¾°ÓëÑÚÂëÏà»ò£¬±ß±£Áô£¬Í¼ÏñÇøÓòÎª1
 			m_dcMem.BitBlt(nLeft + j * nElemW, nTop + i * nElemH, nElemW, nElemH, &m_dcMask, 0, nInfo * nElemH, SRCPAINT);
 
-			//å°†å…ƒç´ å›¾ç‰‡ç›¸ä¸ï¼Œè¾¹ä¿ç•™ï¼Œå›¾åƒåŒºåŸŸä¸ºå…ƒç´ å›¾ç‰‡
+			//½«ÔªËØÍ¼Æ¬ÏàÓë£¬±ß±£Áô£¬Í¼ÏñÇøÓòÎªÔªËØÍ¼Æ¬
 			m_dcMem.BitBlt(nLeft + j * nElemW, nTop + i * nElemH, nElemW, nElemH, &m_dcElm, 0, nInfo * nElemH, SRCAND);
 
 		}

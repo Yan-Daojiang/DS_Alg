@@ -6,7 +6,7 @@
 #include "LLK.h"
 #include "LLKDlg.h"
 #include "afxdialogex.h"
-#include "CGameDlg.h"
+#include "GameDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -20,12 +20,12 @@ class CAboutDlg : public CDialogEx
 public:
 	CAboutDlg();
 
-// 对话框数据
+	// 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_ABOUTBOX };
 #endif
 
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 // 实现
@@ -65,7 +65,8 @@ BEGIN_MESSAGE_MAP(CLLKDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_BN_CLICKED(IDC_BUTTON_BAISC, &CLLKDlg::OnClickedButtonBaisc)
+	ON_BN_CLICKED(IDC_BUTTON_BASIC, &CLLKDlg::OnClickedButtonBasic)
+	
 END_MESSAGE_MAP()
 
 
@@ -102,6 +103,7 @@ BOOL CLLKDlg::OnInitDialog()
 
 	// TODO: 在此添加额外的初始化代码
 	InitBackground();
+
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -143,9 +145,11 @@ void CLLKDlg::OnPaint()
 	}
 	else
 	{
-		//创建CpaintDC对象
+		//创建CPaintDC对象
 		CPaintDC dc(this);
-		dc.BitBlt(0,0,800,600,&m_dcMem,0,0,SRCCOPY);
+
+		dc.BitBlt(0, 0, 800, 600, &m_dcMem, 0, 0, SRCCOPY);
+
 
 		CDialogEx::OnPaint();
 	}
@@ -162,24 +166,25 @@ void CLLKDlg::InitBackground()
 {
 	//加载位图
 	CBitmap bmpMain;
-	bmpMain.LoadBitmapW(IDB_MAIN_BG);
+	bmpMain.LoadBitmap(IDB_MAIN_BG);
 
-	//创建DC
+
+	//创建兼容DC
 	CClientDC dc(this);
 	m_dcMem.CreateCompatibleDC(&dc);
 
 	//将位图选进DC
 	m_dcMem.SelectObject(&bmpMain);
-
 }
 
-void CLLKDlg::OnClickedButtonBaisc()
+
+
+void CLLKDlg::OnClickedButtonBasic()
 {
-	// TODO: 在此添加控件通知处理程序代码
-	this->ShowWindow(SW_HIDE);	 //主界面隐藏
+	this->ShowWindow(SW_HIDE);
 	CGameDlg dlg;
-	dlg.DoModal();	//创建显示模态对话框
-	this->ShowWindow(SW_SHOW);	
-
-
+	dlg.DoModal();
+	this->ShowWindow(SW_SHOW);
+	// TODO: 在此添加控件通知处理程序代码
 }
+
