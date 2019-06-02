@@ -66,7 +66,6 @@ BEGIN_MESSAGE_MAP(CLLKDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BUTTON_BASIC, &CLLKDlg::OnClickedButtonBasic)
-	
 END_MESSAGE_MAP()
 
 
@@ -150,7 +149,6 @@ void CLLKDlg::OnPaint()
 
 		dc.BitBlt(0, 0, 800, 600, &m_dcMem, 0, 0, SRCCOPY);
 
-
 		CDialogEx::OnPaint();
 	}
 }
@@ -177,8 +175,6 @@ void CLLKDlg::InitBackground()
 	m_dcMem.SelectObject(&bmpMain);
 }
 
-
-
 void CLLKDlg::OnClickedButtonBasic()
 {
 	this->ShowWindow(SW_HIDE);
@@ -187,4 +183,3 @@ void CLLKDlg::OnClickedButtonBasic()
 	this->ShowWindow(SW_SHOW);
 	// TODO: 在此添加控件通知处理程序代码
 }
-

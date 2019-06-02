@@ -20,6 +20,10 @@ public:
 	//获得某行某列的图片编号函数
 	int GetElement(int nRow, int nCol);
 
+	void SetFirstPoint(int nRow, int nCol);             //设置第一个点函数
+	void SetSecPoint(int nRow, int nCol);               //设置第二个点函数
+
+	//连接判断函数
+	bool Link(Vertex avPath[MAX_VERTEX_NUM], int &nVexnum);
 };
 
-#pragma once

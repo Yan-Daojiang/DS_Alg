@@ -28,7 +28,9 @@ CGameDlg::CGameDlg(CWnd* pParent /*=nullptr*/)
 	m_rtGameRect.right = m_rtGameRect.left + m_sizeElem.cx * MAX_COL;
 	m_rtGameRect.bottom = m_rtGameRect.top + m_sizeElem.cy * MAX_ROW;
 
-	
+	//初始化图标选中状态
+	m_bFirstPoint = true;
+	m_bPlaying = false;
 
 }
 
@@ -46,8 +48,9 @@ void CGameDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CGameDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_BN_CLICKED(IDC_BUTTON_START, &CGameDlg::OnClickedButtonStart)
-END_MESSAGE_MAP()
+	ON_WM_LBUTTONUP()
 
+END_MESSAGE_MAP()
 
 //初始化窗口背景和大小
 void CGameDlg::InitBackground()
@@ -93,9 +96,7 @@ BOOL CGameDlg::OnInitDialog()
 	//初始化元素
 	InitElement();
 
-	//设置进度条隐藏和剩余时间控件
-	this->GetDlgItem(IDC_GAME_TIME)->ShowWindow(FALSE);
-	this->GetDlgItem(IDC_EDIT_TIME)->ShowWindow(FALSE);
+	
 
 
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -145,11 +146,14 @@ void CGameDlg::OnClickedButtonStart()
 	// TODO: 在此添加控件通知处理程序代码
 	m_gameControl.StartGame();
 
+	//判断是否正在玩游戏
+	m_bPlaying = true;
+	this->GetDlgItem(IDC_BUTTON_START)->EnableWindow(false);
+
 	//更新地图
 	UpdateMap();
-
 	//更新窗口
-	Invalidate(FALSE);	
+	Invalidate(FALSE);
 }
 
 //调整窗口大小
@@ -173,6 +177,7 @@ void CGameDlg::UpdateWindow()
 
 	CenterWindow();
 }
+
 
 //更新地图
 void CGameDlg::UpdateMap()
@@ -204,4 +209,94 @@ void CGameDlg::UpdateMap()
 		}
 	}
 
+}
+
+
+void CGameDlg::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	// TODO: 在此处添加实现代码.
+
+	//去掉小于0状态
+	if (point.x < m_ptGameTop.x || point.y < m_ptGameTop.y) {
+		return CDialogEx::OnLButtonUp(nFlags, point);
+	}
+
+	//换算点击的坐标
+	int nRow = (point.y - m_ptGameTop.y) / m_sizeElem.cy;//行号
+	int nCol = (point.x - m_ptGameTop.x) / m_sizeElem.cx;
+
+	//判断坐标的有效性
+	if (nRow > MAX_ROW - 1 || nCol > MAX_COL - 1) {
+		return CDialogEx::OnLButtonUp(nFlags, point);
+	}
+
+	//第一个点
+	if (m_bFirstPoint) {
+		//绘制提示框
+		DrawTipFrame(nRow, nCol);
+		m_gameControl.SetFirstPoint(nRow, nCol);
+
+	}
+	//第二个点
+	else {
+		//绘制提示框
+		DrawTipFrame(nRow, nCol);
+		m_gameControl.SetSecPoint(nRow, nCol);
+
+		Vertex avPath[MAX_VERTEX_NUM];     //获得路径  ）
+		int nVexnum = 0;      //顶点个数
+
+		//判断是否是相同图片	
+		if (m_gameControl.Link(avPath, nVexnum)) {
+
+			//画提示线
+			DrawTipLine(avPath, nVexnum);
+
+			//更新地图
+			UpdateMap();
+		}
+		Sleep(200);    //延迟
+		InvalidateRect(m_rtGameRect, FALSE); //局部矩形更新
+	}
+	m_bFirstPoint = !m_bFirstPoint; //赋反值
+
+	CDialogEx::OnLButtonUp(nFlags, point);
+}
+
+//绘制矩形提示框
+void CGameDlg::DrawTipFrame(int nRow, int nCol) {
+	CClientDC dc(this);
+	CBrush brush(RGB(233, 43, 43));
+	CRect rtTipFrame;
+	rtTipFrame.left = m_ptGameTop.x + nCol * m_sizeElem.cx;
+	rtTipFrame.top = m_ptGameTop.y + nRow * m_sizeElem.cy;
+	rtTipFrame.right = rtTipFrame.left + m_sizeElem.cx;
+	rtTipFrame.bottom = rtTipFrame.top + m_sizeElem.cy;
+	dc.FrameRect(rtTipFrame, &brush);
+}
+
+//绘制提示线
+void CGameDlg::DrawTipLine(Vertex avPath[MAX_VERTEX_NUM], int nVexnum)
+{
+	//获取DC
+	CClientDC dc(this);
+
+	//设置画笔
+	CPen penLine(PS_SOLID, 2, RGB(0, 255, 0));
+
+	//将画笔选入DC
+	CPen* pOldPen = dc.SelectObject(&penLine);
+
+	dc.MoveTo(m_ptGameTop.x + avPath[0].col * m_sizeElem.cx + m_sizeElem.cx / 2,
+		m_ptGameTop.y + avPath[0].row * m_sizeElem.cy + m_sizeElem.cy / 2);
+	//绘制连接线
+	for (int i = 0; i < nVexnum - 1; i++)
+	{
+
+		dc.LineTo(m_ptGameTop.x + avPath[i + 1].col * m_sizeElem.cx + m_sizeElem.cx / 2,
+			m_ptGameTop.y + avPath[i + 1].row * m_sizeElem.cy + m_sizeElem.cy / 2);
+	}
+
+	dc.SelectObject(pOldPen);
 }
