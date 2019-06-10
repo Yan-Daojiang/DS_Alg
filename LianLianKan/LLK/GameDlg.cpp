@@ -49,8 +49,16 @@ BEGIN_MESSAGE_MAP(CGameDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_BN_CLICKED(IDC_BUTTON_START, &CGameDlg::OnClickedButtonStart)
 	ON_WM_LBUTTONUP()
-
+	ON_BN_CLICKED(IDC_BUTTON_TIPS, &CGameDlg::OnClickedButtonTips)
+	ON_BN_CLICKED(IDC_BUTTON_RESTART, &CGameDlg::OnClickedButtonRestart)
+	ON_WM_TIMER()
+	ON_BN_CLICKED(IDC_BUTTON_STOP, &CGameDlg::OnClickedButtonStop)
+	ON_EN_CHANGE(IDC_EDIT_TIME, &CGameDlg::OnChangeEditTime)
+	ON_BN_CLICKED(IDC_BUTTON_HELP, &CGameDlg::OnBnClickedButtonHelp)
 END_MESSAGE_MAP()
+
+
+
 
 //初始化窗口背景和大小
 void CGameDlg::InitBackground()
@@ -96,7 +104,9 @@ BOOL CGameDlg::OnInitDialog()
 	//初始化元素
 	InitElement();
 
-	
+	//设置进度条隐藏和剩余时间控件
+	this->GetDlgItem(IDC_GAME_TIME)->ShowWindow(FALSE);
+	this->GetDlgItem(IDC_EDIT_TIME)->ShowWindow(FALSE);
 
 
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -144,16 +154,39 @@ void CGameDlg::InitElement() {
 void CGameDlg::OnClickedButtonStart()
 {
 	// TODO: 在此添加控件通知处理程序代码
+
+	//暂停时不响应
+	if (m_bPause == true) return;
+
 	m_gameControl.StartGame();
+
+	//初始时间是300
+	timeCount = 300;
+
+
+
 
 	//判断是否正在玩游戏
 	m_bPlaying = true;
+	//禁止【开始游戏】按钮点击
 	this->GetDlgItem(IDC_BUTTON_START)->EnableWindow(false);
+
+	//初始化进度条
+	m_GameProgress.SetRange(0, 60 * 5);    //初始范围
+	m_GameProgress.SetStep(-1);            //初始步数值
+	m_GameProgress.SetPos(60 * 5);         //设置初始值
+	//启动定时器
+	this->SetTimer(PLAY_TIMER_ID, 1000, NULL);
 
 	//更新地图
 	UpdateMap();
+
 	//更新窗口
 	Invalidate(FALSE);
+
+	//设置进度条隐藏和剩余时间控件
+	this->GetDlgItem(IDC_GAME_TIME)->ShowWindow(TRUE);
+	this->GetDlgItem(IDC_EDIT_TIME)->ShowWindow(TRUE);
 }
 
 //调整窗口大小
@@ -244,7 +277,7 @@ void CGameDlg::OnLButtonUp(UINT nFlags, CPoint point)
 		DrawTipFrame(nRow, nCol);
 		m_gameControl.SetSecPoint(nRow, nCol);
 
-		Vertex avPath[MAX_VERTEX_NUM];     //获得路径  ）
+		Vertex avPath[MAX_VERTEX_NUM];     //获得路径   16为路径最长（不会到16条路径的）
 		int nVexnum = 0;      //顶点个数
 
 		//判断是否是相同图片	
@@ -258,11 +291,25 @@ void CGameDlg::OnLButtonUp(UINT nFlags, CPoint point)
 		}
 		Sleep(200);    //延迟
 		InvalidateRect(m_rtGameRect, FALSE); //局部矩形更新
+
+		//判断胜负
+		JudgeWin();
+
+		/*
+		if (m_gameControl.IsWin()) {
+			MessageBox(_T("\t获胜！"),_T("欢乐连连看　基本模式"));
+			m_bPlaying = false;
+			this->GetDlgItem(IDC_BUTTON_START)->EnableWindow(true); //游戏结束，将【开始游戏】按钮设置为可点击状态
+
+			return;
+		}*/
+
 	}
 	m_bFirstPoint = !m_bFirstPoint; //赋反值
 
 	CDialogEx::OnLButtonUp(nFlags, point);
 }
+
 
 //绘制矩形提示框
 void CGameDlg::DrawTipFrame(int nRow, int nCol) {
@@ -299,4 +346,180 @@ void CGameDlg::DrawTipLine(Vertex avPath[MAX_VERTEX_NUM], int nVexnum)
 	}
 
 	dc.SelectObject(pOldPen);
+}
+
+//【提示】按钮  点击操作
+void CGameDlg::OnClickedButtonTips()
+{
+	// TODO: 在此添加控件通知处理程序代码
+
+	//如果没有进行游戏，则返回
+	if (m_bPlaying == false)
+		return;
+
+	//如果能够连通，绘制提示框和连接线并更新游戏地图
+	Vertex avPath[MAX_VERTEX_NUM];     //获得路径
+	int nVexnum = 0;      //顶点个数
+	if (m_gameControl.Help(avPath, nVexnum))
+	{
+
+		//画第一个点的提示框
+		DrawTipFrame(avPath[0].row, avPath[0].col);
+
+		//画第一个点的提示框
+		DrawTipFrame(avPath[nVexnum - 1].row, avPath[nVexnum - 1].col);
+
+		//画提示线
+		DrawTipLine(avPath, nVexnum);
+
+		Sleep(1000);    //延迟
+
+		UpdateMap();	//更新地图
+
+		InvalidateRect(m_rtGameRect, FALSE);    //局部矩形更新
+	}
+	//为了使用第二个提示框可以看到，暂停200ms后，再刷新界面
+}
+
+//【重排】按钮  点击操作
+void CGameDlg::OnClickedButtonRestart()
+{
+	// TODO: 在此添加控件通知处理程序代码
+
+	//调用CGameControl：：ResetGraph();
+	m_gameControl.Reset();
+
+	//更新地图，调用UpdateMap(),更新界面显示
+	UpdateMap();
+
+	//通知界面重绘
+	InvalidateRect(m_rtGameRect, FALSE);    //局部矩形更新
+
+}
+
+
+void CGameDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+
+	JudgeWin();
+
+	/*if (nIDEvent == PLAY_TIMER_ID && m_bPlaying) {
+		//游戏时间减少一秒
+		m_GameProgress.StepIt();
+	}*/
+
+	//设置进度条的位置之前，需要判断计时器的编号是否是当前的计时器
+	if (nIDEvent == PLAY_TIMER_ID && m_bPlaying && m_bPause == false)
+	{
+		//游戏时间减一秒
+		if (timeCount > -1)
+		{
+			CString str;
+			str.Format(_T("%d"), timeCount);
+			SetDlgItemText(IDC_EDIT_TIME, str);
+
+			UpdateData(false);
+			timeCount--;
+
+			m_GameProgress.StepIt();
+		}
+
+	}
+
+
+	CDialogEx::OnTimer(nIDEvent);
+}
+
+//判断胜负
+void CGameDlg::JudgeWin(void)
+{
+	//游戏胜负判断
+	BOOL bGameStatus = m_gameControl.IsWin(m_GameProgress.GetPos());
+	//判断是否继续游戏
+	if (bGameStatus == GAME_PLAY)
+	{
+		return;
+	}
+	else
+	{
+		//将游戏标识改为false
+		m_bPlaying = false;
+
+		//关闭定时器
+		KillTimer(PLAY_TIMER_ID);
+
+		//提示获胜
+		CString strTitle;
+		this->GetWindowTextW(strTitle);
+		if (bGameStatus == GAME_SUCCESS)
+		{
+			MessageBox(_T("获胜！"), strTitle);
+		}
+		else if (bGameStatus == GAME_LOSE)
+		{
+			MessageBox(_T("很遗憾，时间到了！"), strTitle);
+		}
+		//还原开始游戏按钮，使用按钮可以点击
+		this->GetDlgItem(IDC_BUTTON_START)->EnableWindow(TRUE);
+	}
+
+}
+
+//点击【暂停游戏】按钮
+void CGameDlg::OnClickedButtonStop()
+{
+	// TODO: 在此添加控件通知处理程序代码
+
+	//获得当前对话框的视频内容
+	CClientDC dc(this);
+
+	//游戏没在进行时，直接返回
+	if (m_bPlaying == false)
+		return;
+
+	//如果游戏没有暂停
+	if (m_bPause == false)
+	{
+		//hu绘制背景到内存DC中
+		m_dcMem.BitBlt(MAP_LETF, MAP_TOP, 640, 400, &m_dcCache, 0, 0, SRCCOPY);
+
+		GetDlgItem(IDC_BUTTON_TIPS)->EnableWindow(0);
+		GetDlgItem(IDC_BUTTON_RESTART)->EnableWindow(0);
+		InvalidateRect(m_rtGameRect, FALSE);    //局部矩形更新
+		this->GetDlgItem(IDC_BUTTON_STOP)->SetWindowTextW(_T("继续游戏"));
+	}
+
+	//如果游戏暂停
+	if (m_bPause == true)
+	{
+		UpdateMap();
+		GetDlgItem(IDC_BUTTON_TIPS)->EnableWindow(1);
+		GetDlgItem(IDC_BUTTON_RESTART)->EnableWindow(1);
+		InvalidateRect(m_rtGameRect, FALSE);    //局部矩形更新
+
+		this->GetDlgItem(IDC_BUTTON_STOP)->SetWindowTextW(_T("暂停游戏"));
+	}
+
+	m_bPause = !m_bPause;
+}
+
+
+void CGameDlg::OnChangeEditTime()
+{
+	// TODO:  如果该控件是 RICHEDIT 控件，它将不
+	// 发送此通知，除非重写 CDialogEx::OnInitDialog()
+	// 函数并调用 CRichEditCtrl().SetEventMask()，
+	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+
+	// TODO:  在此添加控件通知处理程序代码
+}
+
+
+void CGameDlg::OnBnClickedButtonHelp()
+{
+	// TODO: 在此添加控件通知处理程序代码
+
+	CHelpDialog dlg;
+	dlg.DoModal();
 }

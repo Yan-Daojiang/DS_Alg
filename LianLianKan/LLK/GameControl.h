@@ -25,5 +25,18 @@ public:
 
 	//连接判断函数
 	bool Link(Vertex avPath[MAX_VERTEX_NUM], int &nVexnum);
+
+	//获胜   //加入计时功能后规则进行修改
+	//bool IsWin();
+	bool IsWin(int nTime);
+
+	//帮助、提示方法
+	bool Help(Vertex avPath[MAX_VERTEX_NUM], int &nVexnum);
+
+	//实现重排功能
+	void Reset(void);
+
+
+
 };
 

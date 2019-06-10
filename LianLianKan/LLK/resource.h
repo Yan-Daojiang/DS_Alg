@@ -9,6 +9,7 @@
 #define IDR_MAINFRAME                   128
 #define IDB_MAIN_BG                     130
 #define IDD_GAME_DIALOG                 131
+#define IDD_DIALOG_HELP                 133
 #define IDC_BUTTON1                     1000
 #define IDC_BUTTON_BASIC                1000
 #define IDC_BUTTON_START                1000
@@ -29,6 +30,8 @@
 #define IDC_BUTTON_HELP                 1010
 #define IDC_GAME_TIME                   1011
 #define IDC_EDIT_TIME                   1012
+#define IDC_SCROLLBAR_HELP              1013
+#define IDC_STATIC_HELP                 1014
 
 // Next default values for new objects
 // 

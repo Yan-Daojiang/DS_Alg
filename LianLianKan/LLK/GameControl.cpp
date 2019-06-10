@@ -75,3 +75,56 @@ bool CGameControl::Link(Vertex avPath[MAX_VERTEX_NUM], int & nVexnum)
 	return false;
 }
 
+//判断是否获胜
+bool CGameControl::IsWin(int nTime)
+{
+	//定义逻辑处理类
+	CGameLogic logic;
+
+	//判断游戏时间
+	if (nTime <= 0)
+	{
+		//清除图
+		m_graph.ClearGraph();
+		return GAME_LOSE;
+	}
+
+	//判断是否图中所有点为空
+	if (logic.IsBlank(m_graph) == true)
+	{
+		//清除图
+		m_graph.ClearGraph();
+		return GAME_SUCCESS;
+	}
+	return GAME_PLAY;
+}
+
+//【提示】按钮功能实现
+bool CGameControl::Help(Vertex avPath[MAX_VERTEX_NUM], int & nVexnum)
+{
+	CGameLogic logic;
+
+	//判断是否为空
+	if (logic.IsBlank(m_graph) == true)
+	{
+		return false;
+	}
+	//查找一个有效的提示路径
+	if (logic.SearchValidPath(m_graph))
+	{
+		//返回路径顶点
+		nVexnum = logic.GetVexPath(avPath);
+
+		return true;
+	}
+	return false;
+
+}
+
+//实现重排功能
+void CGameControl::Reset(void)
+{
+	//重排图中顶点
+	CGameLogic logic;
+	logic.ResetGraph(m_graph);
+}

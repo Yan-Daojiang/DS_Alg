@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Graph.h"
 
+
 CGraph::CGraph()
 {
 	InitGraph();   //初始化图
@@ -11,7 +12,7 @@ CGraph::~CGraph()
 {
 }
 
-//初始化图
+////初始化图
 void CGraph::InitGraph()
 {
 	m_nArcnum = 0;
@@ -75,4 +76,16 @@ int CGraph::GetVexnum()
 	return m_nVexnum;
 }
 
+//清理图结构
+void CGraph::ClearGraph(void)
+{
+	InitGraph();
+}
 
+//调换两个点的位置
+void CGraph::ChangeVerex(int nIndex1, int nIndex2)
+{
+	int Temp = m_Vertices[nIndex1];
+	m_Vertices[nIndex1] = m_Vertices[nIndex2];
+	m_Vertices[nIndex2] = Temp;
+}

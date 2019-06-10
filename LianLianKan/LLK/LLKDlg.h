@@ -1,4 +1,5 @@
-﻿// LLKDlg.h: 头文件
+﻿#include "CHelpDialog.h"
+// LLKDlg.h: 头文件
 //
 
 #pragma once
@@ -34,4 +35,5 @@ protected:
 	void InitBackground();
 public:
 	afx_msg void OnClickedButtonBasic();
+	afx_msg void OnBnClickedButtonLlkhelp();
 };

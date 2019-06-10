@@ -43,6 +43,11 @@ public:
 	//获取图中顶点的个数
 	int GetVexnum();
 
+	//清理 图结构
+	void ClearGraph(void);
+
+	//调换两个点的位置
+	void ChangeVerex(int nIndex1, int nIndex2);
 
 };
 

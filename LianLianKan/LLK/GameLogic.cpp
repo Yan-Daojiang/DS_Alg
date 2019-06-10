@@ -8,6 +8,7 @@ CGameLogic::CGameLogic(void)
 	m_nCorner = 0;     //路径中的拐点数
 }
 
+
 CGameLogic::~CGameLogic(void)
 {
 }
@@ -15,6 +16,8 @@ CGameLogic::~CGameLogic(void)
 //初始化游戏地图
 void CGameLogic::InitMap(CGraph &graph)
 {
+	//游戏地图初始化，固定的值
+	//int anTemp[4][4] = { 2, 0, 1, 3, 2, 2, 1, 3, 2, 1, 0, 0, 1, 3, 0, 3 };
 	//随机生成地图
 	int anTemp[MAX_VERTEX_NUM];
 	//多少花色
@@ -275,4 +278,78 @@ bool CGameLogic::IsCornor(void)
 		}
 	}
 	return false;
+}
+
+//判断图中顶点是不是为空
+bool CGameLogic::IsBlank(CGraph &graph)
+{
+	int nVexnum = graph.GetVexnum();
+	for (int i = 0; i < nVexnum; i++)
+	{
+		if (graph.GetVertex(i) != BLANK)
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+bool CGameLogic::SearchValidPath(CGraph& graph)
+{
+	//得到顶点数
+	int nVexnum = graph.GetVexnum();
+	for (int i = 0; i < nVexnum; i++)
+	{
+		//得到第一个非空顶点
+		if (graph.GetVertex(i) == BLANK)
+		{
+			continue;
+		}
+		//遍历得到第二个同色顶点
+		for (int j = 0; j < nVexnum; j++)
+		{
+			if (i != j)
+			{
+				//如果第i个点和第j个点同色
+				if (graph.GetVertex(i) == graph.GetVertex(j))
+				{
+					//压入第一个点
+					PushVertex(i);
+					if (SearchPath(graph, i, j) == true)
+					{
+						return true;
+					}
+					//取出压入的顶点时，与PushVertex(i);对应
+					PopVertex();
+				}
+
+			}
+		}
+	}
+	return false;
+}
+
+//实现图结构的重排
+void CGameLogic::ResetGraph(CGraph& graph)
+{
+	//随机交换顶点数组中两个顶点的值
+	for (int i = 0; i < 200; i++)
+	{
+		//随机得到两个坐标
+		int nIndex1 = rand() % MAX_VERTEX_NUM;
+		int nIndex2 = rand() % MAX_VERTEX_NUM;
+
+		//交换两个数值
+		graph.ChangeVerex(nIndex1, nIndex2);
+	}
+
+	//更新弧信息
+	for (int i = 0; i < MAX_ROW; i++)
+	{
+		for (int j = 0; j < MAX_COL; j++)
+		{
+			UpdateArc(graph, i, j);
+		}
+	}
+
 }
